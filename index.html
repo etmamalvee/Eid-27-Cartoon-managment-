@@ -51,7 +51,7 @@
                     <i class="fa-solid fa-user-lock"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-slate-800" id="authTitle">লগইন করুন</h2>
-                <p class="text-sm text-slate-5-0 mt-1">কার্টন হিসেব রাখতে আপনার অ্যাকাউন্টে সাইন ইন করুন</p>
+                <p class="text-sm text-slate-500 mt-1">কার্টন হিসেব রাখতে আপনার অ্যাকাউন্টে সাইন ইন করুন</p>
             </div>
 
             <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
@@ -136,10 +136,10 @@
                     </form>
                 </div>
 
-                <!-- RECENTLY ADDED CARDS -->
+                <!-- RECENTLY ADDED CARDS & TABLE BELOW -->
                 <div class="lg:col-span-2 space-y-4">
                     <h3 class="text-lg font-bold text-slate-800 flex justify-between items-center">
-                        <span><i class="fa-solid fa-clock-rotate-left text-indigo-600"></i> সমসাময়িক যুক্ত করা কার্টনসমূহ</span>
+                        <span><i class="fa-solid fa-clock-rotate-left text-indigo-600"></i> যুক্ত করা কার্টনসমূহের তালিকা (সম্প্রতি)</span>
                         <span id="totalCartonBadge" class="text-xs bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-full font-bold">মোট: 0</span>
                     </h3>
 
@@ -234,6 +234,30 @@
         </div>
 
     </main>
+
+    <!-- SUCCESS INTERFACE MODAL -->
+    <div id="successModal" class="fixed inset-0 bg-black/60 z-50 hidden flex justify-center items-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border border-slate-100">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl shadow-inner">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-slate-800">সফলভাবে যুক্ত হয়েছে!</h3>
+                <p class="text-xs text-slate-500 mt-1">কার্টনটির তথ্য সংরক্ষিত হয়েছে এবং তালিকার শীর্ষে যুক্ত করা হয়েছে।</p>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-left text-xs space-y-1 font-mono" id="successDetailsBox">
+                <!-- Details injected via JS -->
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeSuccessModal()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow transition text-xs">
+                    <i class="fa-solid fa-plus"></i> আরও যোগ করুন
+                </button>
+                <button onclick="closeSuccessModal(); switchTab('sheet');" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-lg shadow transition text-xs">
+                    <i class="fa-solid fa-table"></i> শিট দেখুন
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs border-t border-slate-800">
@@ -393,6 +417,7 @@
                 sheetBtn.className = 'px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200';
                 entryTabSection.classList.remove('hidden');
                 sheetTabSection.classList.add('hidden');
+                renderApp();
             } else {
                 sheetBtn.className = 'px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-indigo-600 text-white shadow-sm';
                 entryBtn.className = 'px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200';
@@ -403,7 +428,7 @@
             }
         }
 
-        // CRUD CARTON SUBMIT
+        // CRUD CARTON SUBMIT WITH IMMEDIATE RENDER AND SUCCESS INTERFACE
         function handleCartonSubmit(e) {
             e.preventDefault();
             const cartonNo = document.getElementById('cartonNo').value.trim();
@@ -427,12 +452,16 @@
                     editedAt: null
                 };
 
+                // Add to start of array
                 cartons.unshift(newCarton);
                 localStorage.setItem('carton_records', JSON.stringify(cartons));
 
+                // Reset Form & Instantly Render Updated List Below
                 document.getElementById('cartonForm').reset();
                 renderApp();
-                alert('কার্টন সফলভাবে এন্ট্রি করা হয়েছে!');
+
+                // Open Confirmation Modal Interface
+                showSuccessModal(newCarton);
             };
 
             if (imgInput.files && imgInput.files[0]) {
@@ -444,7 +473,20 @@
             }
         }
 
-        // RENDER ENTRY DASHBOARD CARDS
+        function showSuccessModal(carton) {
+            document.getElementById('successDetailsBox').innerHTML = `
+                <div><span class="text-slate-400">কার্টন:</span> <strong class="text-indigo-600">${carton.cartonNo}</strong></div>
+                <div><span class="text-slate-400">স্টোর:</span> <strong class="text-emerald-600">${carton.storeRoom}</strong></div>
+                <div><span class="text-slate-400">এন্ট্রি বাই:</span> ${carton.createdBy}</div>
+            `;
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        // RENDER ENTRY DASHBOARD CARDS (ALL RECENTLY ADDED ITEMS)
         function renderApp() {
             document.getElementById('totalCartonBadge').innerText = `মোট: ${cartons.length}`;
             const container = document.getElementById('cardsContainer');
@@ -460,9 +502,9 @@
                 return;
             }
 
-            cartons.slice(0, 6).forEach(item => {
+            cartons.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3";
+                card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3 border-l-4 border-l-indigo-600";
                 card.innerHTML = `
                     <div class="space-y-2">
                         <div class="flex justify-between items-start">
@@ -552,7 +594,6 @@
                 closeEditModal();
                 renderApp();
                 renderSheet();
-                alert('তথ্য সফলভাবে এডিট ও আপডেট করা হয়েছে!');
             };
 
             if (imgInput.files && imgInput.files[0]) {
