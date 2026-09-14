@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>কার্টন ট্র্যাকিং লিস্ট</title>
+    <title>কার্টন ট্র্যাকিং অ্যাপ</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,7 +12,7 @@
             padding: 15px;
         }
         .container {
-            max-width: 800px;
+            max-width: 950px;
             margin: 0 auto;
             background: #fff;
             padding: 20px;
@@ -20,11 +20,16 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        
+        /* ফর্ম লেআউট */
         .form-group {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 20px;
+            background: #eef2f5;
+            padding: 15px;
+            border-radius: 6px;
         }
         input, textarea, button {
             padding: 10px;
@@ -32,8 +37,9 @@
             border-radius: 5px;
             font-size: 14px;
         }
-        input[type="text"] { flex: 1; min-width: 150px; }
-        textarea { flex: 2; min-width: 200px; height: 38px; resize: none; }
+        .input-name { flex: 1; min-width: 140px; }
+        .input-carton { flex: 1; min-width: 140px; }
+        textarea { flex: 2; min-width: 220px; height: 38px; resize: none; }
         input[type="file"] { flex: 1; min-width: 180px; }
         button {
             background-color: #28a745;
@@ -45,10 +51,8 @@
         }
         button:hover { background-color: #218838; }
 
-        /* টেবিল স্টাইল */
-        .table-responsive {
-            overflow-x: auto;
-        }
+        /* টেবিল লেআউট */
+        .table-responsive { overflow-x: auto; }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -62,14 +66,46 @@
         }
         th { background-color: #007bff; color: white; }
         tr:nth-child(even) { background-color: #f2f2f2; }
+        
         .product-img {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             object-fit: cover;
             border-radius: 5px;
             border: 1px solid #ddd;
+            cursor: pointer;
+            transition: 0.2s;
         }
+        .product-img:hover { opacity: 0.8; }
         .no-img { color: #888; font-style: italic; font-size: 12px; }
+
+        /* ছবি বড় করে দেখার পপ-আপ (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 8px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -77,9 +113,10 @@
 <div class="container">
     <h2>📦 কার্টন এন্ট্রি ও ট্র্যাকিং সিস্টেম</h2>
 
-    <!-- ডেটা এন্ট্রি ফর্ম -->
+    <!-- এন্ট্রি ফর্ম -->
     <form id="cartonForm" class="form-group">
-        <input type="text" id="cartonNo" placeholder="কার্টন নম্বর (যেমন: C-101)" required>
+        <input type="text" id="personName" class="input-name" placeholder="আপনার নাম" required>
+        <input type="text" id="cartonNo" class="input-carton" placeholder="কার্টন নম্বর (যেমন: C-101)" required>
         <textarea id="productDetails" placeholder="প্রোডাক্ট ডিটেইলস (কী কী আছে)" required></textarea>
         <input type="file" id="cartonImg" accept="image/*">
         <button type="submit">যোগ করুন</button>
@@ -90,24 +127,32 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 10%;">সিরিয়াল</th>
-                    <th style="width: 20%;">কার্টন নম্বর</th>
-                    <th style="width: 45%;">প্রোডাক্ট ডিটেইলস</th>
-                    <th style="width: 25%;">ছবি</th>
+                    <th style="width: 5%;">সিরিয়াল</th>
+                    <th style="width: 15%;">তৈরি করেছে</th>
+                    <th style="width: 15%;">কার্টন নম্বর</th>
+                    <th style="width: 35%;">প্রোডাক্ট ডিটেইলস</th>
+                    <th style="width: 15%;">তারিখ ও সময়</th>
+                    <th style="width: 15%;">ছবি</th>
                 </tr>
             </thead>
             <tbody id="cartonTableBody">
-                <!-- ডায়নামিকভাবে নতুন সারি যুক্ত হবে -->
+                <!-- ডায়নামিকভাবে রো যুক্ত হবে -->
             </tbody>
         </table>
     </div>
+</div>
+
+<!-- ইমেজ পপ-আপ কন্টেইনার -->
+<div id="imgModal" class="modal">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modalImg">
 </div>
 
 <script>
     const form = document.getElementById('cartonForm');
     const tableBody = document.getElementById('cartonTableBody');
 
-    // লোকাল স্টোরেজ থেকে সেভ হওয়া ডেটা পড়া
+    // লোকাল স্টোরেজ থেকে ডেটা লোড
     let cartons = JSON.parse(localStorage.getItem('cartonRecords')) || [];
 
     // টেবিলে ডেটা দেখানোর ফাংশন
@@ -117,32 +162,41 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td><strong>${index + 1}</strong></td>
+                <td>${item.personName}</td>
                 <td>${item.cartonNo}</td>
                 <td style="text-align: left;">${item.productDetails}</td>
+                <td style="font-size: 13px;">${item.dateTime}</td>
                 <td>
-                    ${item.image ? `<img src="${item.image}" class="product-img" alt="Carton Image">` : '<span class="no-img">ছবি নেই</span>'}
+                    ${item.image ? `<img src="${item.image}" class="product-img" onclick="openModal('${item.image}')" alt="Carton Image">` : '<span class="no-img">ছবি নেই</span>'}
                 </td>
             `;
             tableBody.appendChild(row);
         });
     }
 
-    // নতুন কার্টন জমা দেওয়া
+    // নতুন এন্ট্রি সেভ করার ইভেন্ট
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
+        const personName = document.getElementById('personName').value;
         const cartonNo = document.getElementById('cartonNo').value;
         const productDetails = document.getElementById('productDetails').value;
         const imgInput = document.getElementById('cartonImg');
 
+        // আজকের তারিখ ও সময়
+        const now = new Date();
+        const dateTime = now.toLocaleDateString('bn-BD') + ' - ' + now.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+
         const saveRecord = (imgBase64) => {
             const newEntry = {
+                personName: personName,
                 cartonNo: cartonNo,
                 productDetails: productDetails,
+                dateTime: dateTime,
                 image: imgBase64
             };
-            cartons.push(newEntry);
-                localStorage.setItem('cartonRecords', JSON.stringify(cartons));
+            cartons.unshift(newEntry); // নতুন এন্ট্রি উপরে থাকবে
+            localStorage.setItem('cartonRecords', JSON.stringify(cartons));
             renderTable();
             form.reset();
         };
@@ -158,7 +212,17 @@
         }
     });
 
-    // পেজ লোড হলে টেবিল রেন্ডার হবে
+    // ছবি দেখার পপ-আপ ফাংশন
+    function openModal(imgSrc) {
+        document.getElementById('modalImg').src = imgSrc;
+        document.getElementById('imgModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('imgModal').style.display = 'none';
+    }
+
+    // পেজ লোড হলে টেবিল দেখাবে
     renderTable();
 </script>
 
