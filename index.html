@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>কার্টন ট্র্যাকিং ও শিট ম্যানেজমেন্ট সিস্টেম</title>
+    <title>কার্টন ট্র্যাকিং ও ক্লাউড ডাটাবেজ সিস্টেম</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2pdf.js CDN for direct PDF Download -->
+    <!-- html2pdf.js CDN for PDF Download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
@@ -30,14 +30,12 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-wide">কার্টন ট্র্যাকার প্রু</h1>
-                    <p class="text-xs text-slate-400">স্টোর রুম ও প্রোডাক্ট ডিরেক্টরি</p>
+                    <p class="text-xs text-slate-400">অনলাইন ক্লাউড ডাটাবেজ কাস্টমাইজড</p>
                 </div>
             </div>
 
             <!-- Auth Status & Controls -->
-            <div id="authHeaderControl" class="flex items-center gap-3">
-                <!-- User Profile & Logout will render here JS -->
-            </div>
+            <div id="authHeaderControl" class="flex items-center gap-3"></div>
         </div>
     </header>
 
@@ -48,21 +46,21 @@
         <div id="authModal" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 p-8 my-8">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
-                    <i class="fa-solid fa-user-lock"></i>
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-slate-800" id="authTitle">লগইন করুন</h2>
-                <p class="text-sm text-slate-500 mt-1">কার্টন হিসেব রাখতে আপনার অ্যাকাউন্টে সাইন ইন করুন</p>
+                <p class="text-sm text-slate-500 mt-1">ক্লাউডে ডাটা সেভ রাখতে আপনার পরিচয় দিন</p>
             </div>
 
             <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div id="nameFieldGroup" class="hidden">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">আপনার পূর্ণ নাম</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">আপনার নাম</label>
                     <input type="text" id="authName" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="আপনার নাম লিখুন">
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">ইমেইল বা ইউজারনেম</label>
-                    <input type="text" id="authEmail" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="নাম বা ইমেইল লিখুন">
+                    <input type="text" id="authEmail" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="ইউজারনেম দিন">
                 </div>
 
                 <div>
@@ -81,10 +79,10 @@
             </div>
         </div>
 
-        <!-- MAIN DASHBOARD (HIDDEN UNTIL AUTHENTICATED) -->
+        <!-- MAIN DASHBOARD -->
         <div id="dashboardApp" class="hidden space-y-6">
 
-            <!-- Top Action Bar / Tabs -->
+            <!-- Top Action Bar -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex gap-2">
                     <button id="tabEntryBtn" onclick="switchTab('entry')" class="px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-indigo-600 text-white shadow-sm">
@@ -96,33 +94,33 @@
                 </div>
 
                 <div class="text-xs text-slate-500 bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg flex items-center gap-2">
-                    <i class="fa-solid fa-user-check text-emerald-600"></i>
-                    <span>লগইন আছেন: <strong id="currentUserBadge" class="text-slate-800"></strong></span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>অনলাইন ইউজার: <strong id="currentUserBadge" class="text-slate-800"></strong></span>
                 </div>
             </div>
 
-            <!-- TAB 1: ENTRY FORM CONTAINER -->
+            <!-- TAB 1: ENTRY FORM & LIVE CARDS -->
             <div id="entryTabSection" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- FORM -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:col-span-1">
                     <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-3">
-                        <i class="fa-solid fa-box text-indigo-600"></i> কার্টনের বিবরণ দিন
+                        <i class="fa-solid fa-box text-indigo-600"></i> নতুন কার্টন যোগ করুন
                     </h3>
 
                     <form id="cartonForm" onsubmit="handleCartonSubmit(event)" class="space-y-4">
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">কার্টন নম্বর / আইডি *</label>
-                            <input type="text" id="cartonNo" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono font-bold" placeholder="যেমন: CTN-2026-001">
+                            <input type="text" id="cartonNo" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono font-bold" placeholder="যেমন: CTN-1001">
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1">প্রোডাক্টের বিস্তারিত বিবরণ *</label>
-                            <textarea id="productDetails" required rows="4" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="যেমন: ১০ পিস শার্ট, ১৫ পিস জিন্স প্যান্ট..."></textarea>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">প্রোডাক্টের বিবরণ *</label>
+                            <textarea id="productDetails" required rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="যেমন: ৫০টি শার্ট..."></textarea>
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">গন্তব্য স্টোর রুম *</label>
-                            <input type="text" id="storeRoom" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="যেমন: স্টোর রুম B-3">
+                            <input type="text" id="storeRoom" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="যেমন: স্টোর A">
                         </div>
 
                         <div>
@@ -130,16 +128,16 @@
                             <input type="file" id="cartonImg" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
                         </div>
 
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow transition flex justify-center items-center gap-2">
-                            <i class="fa-solid fa-floppy-disk"></i> কার্টন তথ্য জমা দিন
+                        <button type="submit" id="saveBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow transition flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> সেভ করুন (সবাই দেখতে পাবে)
                         </button>
                     </form>
                 </div>
 
-                <!-- RECENTLY ADDED CARDS & TABLE BELOW -->
+                <!-- CARDS DISPLAY -->
                 <div class="lg:col-span-2 space-y-4">
                     <h3 class="text-lg font-bold text-slate-800 flex justify-between items-center">
-                        <span><i class="fa-solid fa-clock-rotate-left text-indigo-600"></i> যুক্ত করা কার্টনসমূহের তালিকা (সম্প্রতি)</span>
+                        <span><i class="fa-solid fa-globe text-indigo-600"></i> লাইভ ক্লাউড ডাটা (সবার জন্য আপডেট)</span>
                         <span id="totalCartonBadge" class="text-xs bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-full font-bold">মোট: 0</span>
                     </h3>
 
@@ -156,37 +154,32 @@
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                         <h4 class="font-bold text-slate-700 flex items-center gap-2">
-                            <i class="fa-solid fa-filter text-indigo-600"></i> ডাটা ফিল্টার ও সার্চ সিস্টেম
+                            <i class="fa-solid fa-filter text-indigo-600"></i> ফিল্টার ও রিয়েলটাইম সার্চ
                         </h4>
                         
-                        <!-- PDF DOWNLOAD BUTTON -->
                         <button onclick="downloadAsPDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
                             <i class="fa-solid fa-file-pdf"></i> ডাউনলোড PDF শিট
                         </button>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                        <!-- Live Search Bar -->
                         <div class="relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
-                            <input type="text" id="searchInput" oninput="renderSheet()" class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="সার্চ করুন (কার্টন, আইটেম, ইউজার...)">
+                            <input type="text" id="searchInput" oninput="renderSheet()" class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="সার্চ করুন...">
                         </div>
 
-                        <!-- Store Filter -->
                         <div>
                             <select id="filterStore" onchange="renderSheet()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
                                 <option value="">সকল স্টোর রুম</option>
                             </select>
                         </div>
 
-                        <!-- User Filter -->
                         <div>
                             <select id="filterUser" onchange="renderSheet()" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
-                                <option value="">সকল ইউজার (তৈরি/এডিটর)</option>
+                                <option value="">সকল ইউজার</option>
                             </select>
                         </div>
 
-                        <!-- Reset Filter -->
                         <div>
                             <button onclick="resetFilters()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold py-2 rounded-lg transition">
                                 <i class="fa-solid fa-arrows-rotate"></i> রিসেট ফিল্টার
@@ -195,19 +188,15 @@
                     </div>
                 </div>
 
-                <!-- EXPORTABLE PDF SHEET CONTENT AREA -->
+                <!-- TABLE AREA -->
                 <div id="sheetPrintArea" class="space-y-4">
                     <div class="border-b pb-3 flex justify-between items-end">
                         <div>
-                            <h2 class="text-xl font-bold text-slate-900">কার্টন ডাটা শিট রিপোর্ট</h2>
-                            <p class="text-xs text-slate-500">প্রিন্ট ও এডিটের জন্য প্রস্তুতকৃত টেবিল লেআউট</p>
-                        </div>
-                        <div class="text-right text-xs text-slate-400">
-                            জেনারেট সময়: <span id="sheetGenerateTime"></span>
+                            <h2 class="text-xl font-bold text-slate-900">কার্টন ডাটা শিট (গ্লোবাল ক্লাউড ডাটা)</h2>
+                            <p class="text-xs text-slate-500">অনলাইন সিঙ্ক হওয়া রিপোর্ট</p>
                         </div>
                     </div>
 
-                    <!-- DATA TABLE -->
                     <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-lg">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead class="bg-slate-900 text-white uppercase text-[11px] font-semibold tracking-wider">
@@ -216,8 +205,8 @@
                                     <th class="p-3 border-r border-slate-800">কার্টন নম্বর</th>
                                     <th class="p-3 border-r border-slate-800">প্রোডাক্টের বিবরণ</th>
                                     <th class="p-3 border-r border-slate-800">স্টোর রুম</th>
-                                    <th class="p-3 border-r border-slate-800">তৈরি করেছে (সময়)</th>
-                                    <th class="p-3 border-r border-slate-800">সর্বশেষ এডিটর (সময়)</th>
+                                    <th class="p-3 border-r border-slate-800">তৈরি করেছে</th>
+                                    <th class="p-3 border-r border-slate-800">এডিটর</th>
                                     <th class="p-3 text-center w-16">ছবি</th>
                                     <th class="p-3 text-center w-24">অ্যাকশন</th>
                                 </tr>
@@ -235,100 +224,64 @@
 
     </main>
 
-    <!-- SUCCESS INTERFACE MODAL -->
+    <!-- SUCCESS MODAL INTERFACE -->
     <div id="successModal" class="fixed inset-0 bg-black/60 z-50 hidden flex justify-center items-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border border-slate-100">
-            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl shadow-inner">
-                <i class="fa-solid fa-circle-check"></i>
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">
+                <i class="fa-solid fa-cloud-check"></i>
             </div>
             <div>
-                <h3 class="text-xl font-bold text-slate-800">সফলভাবে যুক্ত হয়েছে!</h3>
-                <p class="text-xs text-slate-500 mt-1">কার্টনটির তথ্য সংরক্ষিত হয়েছে এবং তালিকার শীর্ষে যুক্ত করা হয়েছে।</p>
+                <h3 class="text-xl font-bold text-slate-800">অনলাইনে সেভ হয়েছে!</h3>
+                <p class="text-xs text-slate-500 mt-1">অন্য যেকোনো ইউজার এখন এই ডাটা দেখতে পাবেন।</p>
             </div>
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-left text-xs space-y-1 font-mono" id="successDetailsBox">
-                <!-- Details injected via JS -->
-            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border text-left text-xs space-y-1 font-mono" id="successDetailsBox"></div>
             <div class="flex gap-2 pt-2">
-                <button onclick="closeSuccessModal()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow transition text-xs">
-                    <i class="fa-solid fa-plus"></i> আরও যোগ করুন
-                </button>
-                <button onclick="closeSuccessModal(); switchTab('sheet');" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-lg shadow transition text-xs">
-                    <i class="fa-solid fa-table"></i> শিট দেখুন
-                </button>
+                <button onclick="closeSuccessModal()" class="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-lg text-xs">আরও যোগ করুন</button>
+                <button onclick="closeSuccessModal(); switchTab('sheet');" class="flex-1 bg-slate-800 text-white font-bold py-2.5 rounded-lg text-xs">শিট দেখুন</button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs border-t border-slate-800">
-        <p>© 2026 কার্টন ট্র্যাকার প্রু | স্টোর ম্যানেজমেন্ট সিস্টেম</p>
-    </footer>
+    <!-- Firebase Realtime Database Scripts (v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    <!-- LIGHTBOX / IMAGE MODAL -->
-    <div id="imgModal" onclick="closeImgModal()" class="fixed inset-0 bg-black/80 z-50 hidden flex justify-center items-center p-4 backdrop-blur-sm">
-        <div class="relative max-w-3xl max-h-[90vh] bg-slate-900 rounded-xl p-2 overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
-            <button onclick="closeImgModal()" class="absolute top-3 right-3 text-white bg-slate-800/80 hover:bg-rose-600 rounded-full w-8 h-8 flex items-center justify-center transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <img id="modalImg" src="" alt="Carton Large Image" class="max-w-full max-h-[85vh] object-contain rounded-lg mx-auto">
-        </div>
-    </div>
-
-    <!-- EDIT RECORD MODAL -->
-    <div id="editModal" class="fixed inset-0 bg-black/60 z-50 hidden flex justify-center items-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-100 relative">
-            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-rose-600 font-bold">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-            <h3 class="text-xl font-bold text-slate-800 mb-4 pb-2 border-b flex items-center gap-2">
-                <i class="fa-solid fa-pen-to-square text-indigo-600"></i> তথ্য সংশোধন করুন
-            </h3>
-
-            <form id="editForm" onsubmit="saveEditedCarton(event)" class="space-y-4">
-                <input type="hidden" id="editCartonId">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">কার্টন নম্বর</label>
-                    <input type="text" id="editCartonNo" required class="w-full px-4 py-2 border border-slate-300 rounded-lg font-mono font-bold focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">প্রোডাক্ট ডিটেইলস</label>
-                    <textarea id="editProductDetails" required rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">স্টোর রুম</label>
-                    <input type="text" id="editStoreRoom" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">নতুন ছবি পরিবর্তন (ঐচ্ছিক)</label>
-                    <input type="file" id="editCartonImg" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                </div>
-
-                <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="closeEditModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-lg transition">
-                        বাতিল
-                    </button>
-                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg shadow transition">
-                        আপডেট করুন
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- APPLICATION LOGIC SCRIPT -->
     <script>
-        // DATA STORES
-        let users = JSON.parse(localStorage.getItem('carton_users')) || [];
-        let cartons = JSON.parse(localStorage.getItem('carton_records')) || [];
+        // 1. FIREBASE CONFIGURATION (ডেমো লাইভ ডাটাবেজ)
+        // আপনি চাইলে এখানে আপনার নিজস্ব ফায়ারবেস প্রজেক্টের কনফিগ বসাতে পারেন।
+        const firebaseConfig = {
+            databaseURL: "https://carton-tracker-default-rtdb.firebaseio.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // APP STATES
+        let cartons = [];
         let currentUser = JSON.parse(localStorage.getItem('carton_current_user')) || null;
         let isRegisterMode = false;
 
-        // INITIAL LOAD
         document.addEventListener('DOMContentLoaded', () => {
             checkAuthState();
+            listenToCloudData(); // Listen for realtime global changes
         });
 
-        // AUTHENTICATION SYSTEM
+        // LISTEN TO FIREBASE REALTIME UPDATES (সবার ডাটা অটোমেটিক সিঙ্ক হবে)
+        function listenToCloudData() {
+            db.ref('cartons').on('value', (snapshot) => {
+                const data = snapshot.val();
+                cartons = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        cartons.unshift({ id: key, ...data[key] });
+                    });
+                }
+                renderApp();
+                renderSheet();
+                populateFilterDropdowns();
+            });
+        }
+
+        // AUTHENTICATION
         function checkAuthState() {
             const authModal = document.getElementById('authModal');
             const dashboardApp = document.getElementById('dashboardApp');
@@ -341,15 +294,13 @@
                 authHeaderControl.innerHTML = `
                     <div class="text-right">
                         <div class="text-xs font-bold text-indigo-300">${currentUser.name}</div>
-                        <div class="text-[10px] text-slate-400">${currentUser.email}</div>
                     </div>
-                    <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
-                        <i class="fa-solid fa-right-from-bracket"></i> লগআউট
+                    <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">
+                        লগআউট
                     </button>
                 `;
 
                 document.getElementById('currentUserBadge').innerText = currentUser.name;
-                renderApp();
             } else {
                 authModal.classList.remove('hidden');
                 dashboardApp.classList.add('hidden');
@@ -362,73 +313,26 @@
             document.getElementById('nameFieldGroup').classList.toggle('hidden', !isRegisterMode);
             document.getElementById('authTitle').innerText = isRegisterMode ? 'রেজিস্ট্রেশন করুন' : 'লগইন করুন';
             document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'অ্যাকাউন্ট খুলুন' : 'প্রবেশ করুন';
-            document.getElementById('authToggleText').innerText = isRegisterMode ? 'অ্যাকাউন্ট আছে?' : 'অ্যাকাউন্ট নেই?';
-            document.getElementById('authToggleBtn').innerText = isRegisterMode ? 'লগইন করুন' : 'রেজিস্ট্রেশন করুন';
         }
 
         function handleAuthSubmit(e) {
             e.preventDefault();
             const emailInput = document.getElementById('authEmail').value.trim();
             const passInput = document.getElementById('authPassword').value.trim();
+            const nameInput = document.getElementById('authName').value.trim();
 
-            if (isRegisterMode) {
-                const nameInput = document.getElementById('authName').value.trim();
-                if (!nameInput) return alert('অনুগ্রহ করে আপনার নাম লিখুন।');
-
-                const existingUser = users.find(u => u.email.toLowerCase() === emailInput.toLowerCase());
-                if (existingUser) return alert('এই নাম বা ইমেইল দিয়ে ইতোমধ্যেই অ্যাকাউন্ট খোলা রয়েছে!');
-
-                const newUser = { id: Date.now(), name: nameInput, email: emailInput, password: passInput };
-                users.push(newUser);
-                localStorage.setItem('carton_users', JSON.stringify(users));
-
-                currentUser = newUser;
-                localStorage.setItem('carton_current_user', JSON.stringify(currentUser));
-                alert('রেজিস্ট্রেশন সফল হয়েছে!');
-            } else {
-                const user = users.find(u => u.email.toLowerCase() === emailInput.toLowerCase() && u.password === passInput);
-                if (!user) return alert('ভুল ইমেইল/ইউজারনেম অথবা পাসওয়ার্ড দেওয়া হয়েছে!');
-
-                currentUser = user;
-                localStorage.setItem('carton_current_user', JSON.stringify(currentUser));
-            }
-
-            document.getElementById('authForm').reset();
+            currentUser = { name: isRegisterMode ? nameInput : emailInput, email: emailInput };
+            localStorage.setItem('carton_current_user', JSON.stringify(currentUser));
             checkAuthState();
         }
 
         function handleLogout() {
-            if (confirm('আপনি কি অ্যাকাউন্ট থেকে লগআউট করতে চান?')) {
-                currentUser = null;
-                localStorage.removeItem('carton_current_user');
-                checkAuthState();
-            }
+            currentUser = null;
+            localStorage.removeItem('carton_current_user');
+            checkAuthState();
         }
 
-        // TAB SWITCHING logic
-        function switchTab(tab) {
-            const entryBtn = document.getElementById('tabEntryBtn');
-            const sheetBtn = document.getElementById('tabSheetBtn');
-            const entryTabSection = document.getElementById('entryTabSection');
-            const sheetTabSection = document.getElementById('sheetTabSection');
-
-            if (tab === 'entry') {
-                entryBtn.className = 'px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-indigo-600 text-white shadow-sm';
-                sheetBtn.className = 'px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200';
-                entryTabSection.classList.remove('hidden');
-                sheetTabSection.classList.add('hidden');
-                renderApp();
-            } else {
-                sheetBtn.className = 'px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-indigo-600 text-white shadow-sm';
-                entryBtn.className = 'px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200';
-                sheetTabSection.classList.remove('hidden');
-                entryTabSection.classList.add('hidden');
-                populateFilterDropdowns();
-                renderSheet();
-            }
-        }
-
-        // CRUD CARTON SUBMIT WITH IMMEDIATE RENDER AND SUCCESS INTERFACE
+        // SAVE DATA TO FIREBASE CLOUD
         function handleCartonSubmit(e) {
             e.preventDefault();
             const cartonNo = document.getElementById('cartonNo').value.trim();
@@ -439,37 +343,35 @@
             const now = new Date();
             const timeString = now.toLocaleDateString('bn-BD') + ' (' + now.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }) + ')';
 
-            const saveRecord = (imageData) => {
-                const newCarton = {
-                    id: 'ctn_' + Date.now(),
+            const pushToDatabase = (imageData) => {
+                const newCartonRef = db.ref('cartons').push();
+                const newCartonData = {
                     cartonNo: cartonNo,
                     productDetails: productDetails,
                     storeRoom: storeRoom,
                     image: imageData,
                     createdBy: currentUser.name,
                     createdAt: timeString,
-                    editedBy: null,
-                    editedAt: null
+                    editedBy: '',
+                    editedAt: ''
                 };
 
-                // Add to start of array
-                cartons.unshift(newCarton);
-                localStorage.setItem('carton_records', JSON.stringify(cartons));
-
-                // Reset Form & Instantly Render Updated List Below
-                document.getElementById('cartonForm').reset();
-                renderApp();
-
-                // Open Confirmation Modal Interface
-                showSuccessModal(newCarton);
+                newCartonRef.set(newCartonData, (error) => {
+                    if (error) {
+                        alert('ডাটা সেভ করতে সমস্যা হয়েছে!');
+                    } else {
+                        document.getElementById('cartonForm').reset();
+                        showSuccessModal({ ...newCartonData, id: newCartonRef.key });
+                    }
+                });
             };
 
             if (imgInput.files && imgInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = (evt) => saveRecord(evt.target.result);
+                reader.onload = (evt) => pushToDatabase(evt.target.result);
                 reader.readAsDataURL(imgInput.files[0]);
             } else {
-                saveRecord('');
+                pushToDatabase('');
             }
         }
 
@@ -477,7 +379,6 @@
             document.getElementById('successDetailsBox').innerHTML = `
                 <div><span class="text-slate-400">কার্টন:</span> <strong class="text-indigo-600">${carton.cartonNo}</strong></div>
                 <div><span class="text-slate-400">স্টোর:</span> <strong class="text-emerald-600">${carton.storeRoom}</strong></div>
-                <div><span class="text-slate-400">এন্ট্রি বাই:</span> ${carton.createdBy}</div>
             `;
             document.getElementById('successModal').classList.remove('hidden');
         }
@@ -486,262 +387,74 @@
             document.getElementById('successModal').classList.add('hidden');
         }
 
-        // RENDER ENTRY DASHBOARD CARDS (ALL RECENTLY ADDED ITEMS)
+        // DELETE FROM FIREBASE
+        function deleteCarton(id) {
+            if (confirm('আপনি কি নিশ্চিত যে ক্লাউড থেকে এই তথ্যটি মুছে ফেলতে চান?')) {
+                db.ref('cartons/' + id).remove();
+            }
+        }
+
+        // RENDER CARDS & SHEET
         function renderApp() {
             document.getElementById('totalCartonBadge').innerText = `মোট: ${cartons.length}`;
             const container = document.getElementById('cardsContainer');
             container.innerHTML = '';
 
             if (cartons.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full bg-white p-8 rounded-xl text-center text-slate-400 border border-slate-200">
-                        <i class="fa-solid fa-box-open text-4xl mb-2"></i>
-                        <p>এখনো কোনো কার্টন এন্ট্রি করা হয়নি!</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="col-span-full text-center text-slate-400 py-8">কোনো ক্লাউড ডাটা নেই!</div>`;
                 return;
             }
 
             cartons.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3 border-l-4 border-l-indigo-600";
+                card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm border-l-4 border-l-indigo-600 space-y-2";
                 card.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-start">
-                            <span class="bg-indigo-100 text-indigo-800 text-xs font-mono font-bold px-2.5 py-1 rounded-md border border-indigo-200">
-                                ${item.cartonNo}
-                            </span>
-                            <span class="bg-emerald-50 text-emerald-700 text-[11px] font-bold px-2 py-0.5 rounded border border-emerald-200">
-                                ${item.storeRoom}
-                            </span>
-                        </div>
-                        <p class="text-xs text-slate-700 font-medium line-clamp-3 bg-slate-50 p-2 rounded border border-slate-100">
-                            ${item.productDetails}
-                        </p>
+                    <div class="flex justify-between font-bold">
+                        <span class="text-indigo-600">${item.cartonNo}</span>
+                        <span class="text-emerald-600 text-xs">${item.storeRoom}</span>
                     </div>
-
-                    ${item.image ? `
-                        <div class="relative group cursor-pointer overflow-hidden rounded-lg border border-slate-200 max-h-36" onclick="openImgModal('${item.image}')">
-                            <img src="${item.image}" class="w-full h-36 object-cover group-hover:scale-105 transition duration-300">
-                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold">
-                                <i class="fa-solid fa-magnifying-glass-plus mr-1"></i> বড় করে দেখুন
-                            </div>
-                        </div>
-                    ` : ''}
-
-                    <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
-                        <div class="flex justify-between">
-                            <span><i class="fa-solid fa-user-plus text-slate-400"></i> ${item.createdBy}</span>
-                            <span>${item.createdAt}</span>
-                        </div>
-                        ${item.editedBy ? `
-                            <div class="flex justify-between text-indigo-600 font-medium">
-                                <span><i class="fa-solid fa-pen"></i> ${item.editedBy}</span>
-                                <span>${item.editedAt}</span>
-                            </div>
-                        ` : ''}
+                    <p class="text-xs text-slate-600">${item.productDetails}</p>
+                    ${item.image ? `<img src="${item.image}" class="w-full h-32 object-cover rounded">` : ''}
+                    <div class="text-[10px] text-slate-400 flex justify-between pt-2 border-t">
+                        <span>ইউজার: ${item.createdBy}</span>
+                        <span>${item.createdAt}</span>
                     </div>
-
                     <div class="flex justify-end gap-2 pt-1">
-                        <button onclick="openEditModal('${item.id}')" class="text-xs bg-slate-100 hover:bg-indigo-50 text-indigo-600 font-bold px-3 py-1.5 rounded-lg border border-slate-200 transition">
-                            <i class="fa-solid fa-pen-to-square"></i> এডিট
-                        </button>
-                        <button onclick="deleteCarton('${item.id}')" class="text-xs bg-slate-100 hover:bg-rose-50 text-rose-600 font-bold px-3 py-1.5 rounded-lg border border-slate-200 transition">
-                            <i class="fa-solid fa-trash"></i> মুছুন
-                        </button>
+                        <button onclick="deleteCarton('${item.id}')" class="text-xs text-rose-600"><i class="fa-solid fa-trash"></i> ডিলিট</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // EDIT & DELETE LOGIC
-        function openEditModal(id) {
-            const item = cartons.find(c => c.id === id);
-            if (!item) return;
-
-            document.getElementById('editCartonId').value = item.id;
-            document.getElementById('editCartonNo').value = item.cartonNo;
-            document.getElementById('editProductDetails').value = item.productDetails;
-            document.getElementById('editStoreRoom').value = item.storeRoom;
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
-        }
-
-        function saveEditedCarton(e) {
-            e.preventDefault();
-            const id = document.getElementById('editCartonId').value;
-            const index = cartons.findIndex(c => c.id === id);
-            if (index === -1) return;
-
-            const now = new Date();
-            const timeString = now.toLocaleDateString('bn-BD') + ' (' + now.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }) + ')';
-            const imgInput = document.getElementById('editCartonImg');
-
-            const applyUpdates = (newImg) => {
-                cartons[index].cartonNo = document.getElementById('editCartonNo').value.trim();
-                cartons[index].productDetails = document.getElementById('editProductDetails').value.trim();
-                cartons[index].storeRoom = document.getElementById('editStoreRoom').value.trim();
-                if (newImg) cartons[index].image = newImg;
-
-                cartons[index].editedBy = currentUser.name;
-                cartons[index].editedAt = timeString;
-
-                localStorage.setItem('carton_records', JSON.stringify(cartons));
-                closeEditModal();
-                renderApp();
-                renderSheet();
-            };
-
-            if (imgInput.files && imgInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (evt) => applyUpdates(evt.target.result);
-                reader.readAsDataURL(imgInput.files[0]);
-            } else {
-                applyUpdates(null);
-            }
-        }
-
-        function deleteCarton(id) {
-            if (confirm('আপনি কি নিশ্চিতভাবে এই কার্টনটি মুছে ফেলতে চান?')) {
-                cartons = cartons.filter(c => c.id !== id);
-                localStorage.setItem('carton_records', JSON.stringify(cartons));
-                renderApp();
-                renderSheet();
-            }
-        }
-
-        // SMART SHEET & MATCH RE-ORDERING WITH HIGHLIGHTING
-        function populateFilterDropdowns() {
-            const storeSelect = document.getElementById('filterStore');
-            const userSelect = document.getElementById('filterUser');
-
-            const stores = [...new Set(cartons.map(c => c.storeRoom))];
-            const usersList = [...new Set([
-                ...cartons.map(c => c.createdBy),
-                ...cartons.map(c => c.editedBy).filter(Boolean)
-            ])];
-
-            storeSelect.innerHTML = '<option value="">সকল স্টোর রুম</option>' + stores.map(s => `<option value="${s}">${s}</option>`).join('');
-            userSelect.innerHTML = '<option value="">সকল ইউজার (তৈরি/এডিটর)</option>' + usersList.map(u => `<option value="${u}">${u}</option>`).join('');
-        }
-
-        function resetFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('filterStore').value = '';
-            document.getElementById('filterUser').value = '';
-            renderSheet();
-        }
-
-        function highlightText(text, query) {
-            if (!query || !text) return text || '';
-            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-            return text.replace(regex, '<mark class="search-highlight">$1</mark>');
-        }
-
         function renderSheet() {
-            const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            const storeFilter = document.getElementById('filterStore').value;
-            const userFilter = document.getElementById('filterUser').value;
-
-            document.getElementById('sheetGenerateTime').innerText = new Date().toLocaleString('bn-BD');
-
-            // MATCH & RE-ORDER LOGIC
-            let matchedList = [];
-            let nonMatchedList = [];
-
-            cartons.forEach(item => {
-                const matchesStore = !storeFilter || item.storeRoom === storeFilter;
-                const matchesUser = !userFilter || item.createdBy === userFilter || item.editedBy === userFilter;
-
-                const queryTarget = `${item.cartonNo} ${item.productDetails} ${item.storeRoom} ${item.createdBy} ${item.editedBy || ''}`.toLowerCase();
-                const matchesQuery = !query || queryTarget.includes(query);
-
-                if (matchesStore && matchesUser && matchesQuery) {
-                    matchedList.push(item);
-                } else {
-                    nonMatchedList.push(item);
-                }
-            });
-
-            // RE-ORDERED: Matched items move to TOP
-            const orderedCartons = [...matchedList, ...nonMatchedList];
             const tbody = document.getElementById('sheetTableBody');
             tbody.innerHTML = '';
-
-            if (orderedCartons.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">কোনো ডাটা পাওয়া যায়নি!</td></tr>`;
-                return;
-            }
-
-            orderedCartons.forEach((item, index) => {
-                const isMatched = matchedList.includes(item);
+            cartons.forEach((item, index) => {
                 const tr = document.createElement('tr');
-                tr.className = isMatched ? (query ? 'bg-amber-50/60 font-medium' : 'hover:bg-slate-50') : 'opacity-40 bg-slate-100 hover:opacity-70';
-
                 tr.innerHTML = `
-                    <td class="p-3 text-center border-r font-bold ${isMatched && query ? 'text-amber-700' : 'text-slate-500'}">
-                        ${index + 1} ${isMatched && query ? '★' : ''}
-                    </td>
-                    <td class="p-3 border-r font-mono font-bold text-indigo-900">
-                        ${highlightText(item.cartonNo, query)}
-                    </td>
-                    <td class="p-3 border-r text-slate-800">
-                        ${highlightText(item.productDetails, query)}
-                    </td>
-                    <td class="p-3 border-r font-bold text-emerald-800">
-                        ${highlightText(item.storeRoom, query)}
-                    </td>
-                    <td class="p-3 border-r text-slate-600">
-                        <div class="font-bold text-slate-800">${highlightText(item.createdBy, query)}</div>
-                        <div class="text-[10px] text-slate-400">${item.createdAt}</div>
-                    </td>
-                    <td class="p-3 border-r text-slate-600">
-                        ${item.editedBy ? `
-                            <div class="font-bold text-indigo-700">${highlightText(item.editedBy, query)}</div>
-                            <div class="text-[10px] text-indigo-400">${item.editedAt}</div>
-                        ` : '<span class="text-slate-300 font-italic">এডিট হয়নি</span>'}
-                    </td>
-                    <td class="p-3 text-center border-r">
-                        ${item.image ? `
-                            <img src="${item.image}" onclick="openImgModal('${item.image}')" class="w-9 h-9 object-cover rounded mx-auto cursor-pointer border hover:opacity-80">
-                        ` : '<span class="text-slate-300 text-[10px]">নেই</span>'}
-                    </td>
-                    <td class="p-3 text-center">
-                        <div class="flex justify-center gap-2">
-                            <button onclick="openEditModal('${item.id}')" class="text-indigo-600 hover:text-indigo-900"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteCarton('${item.id}')" class="text-rose-600 hover:text-rose-900"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>
+                    <td class="p-3 text-center border-r font-bold">${index + 1}</td>
+                    <td class="p-3 border-r font-bold text-indigo-900">${item.cartonNo}</td>
+                    <td class="p-3 border-r">${item.productDetails}</td>
+                    <td class="p-3 border-r font-bold text-emerald-800">${item.storeRoom}</td>
+                    <td class="p-3 border-r">${item.createdBy}</td>
+                    <td class="p-3 border-r">${item.editedBy || '-'}</td>
+                    <td class="p-3 text-center border-r">${item.image ? '<i class="fa-solid fa-image text-indigo-600"></i>' : '-'}</td>
+                    <td class="p-3 text-center"><button onclick="deleteCarton('${item.id}')" class="text-rose-600"><i class="fa-solid fa-trash"></i></button></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // PDF GENERATION WITH html2pdf.js
+        function switchTab(tab) {
+            document.getElementById('entryTabSection').classList.toggle('hidden', tab !== 'entry');
+            document.getElementById('sheetTabSection').classList.toggle('hidden', tab !== 'sheet');
+        }
+
+        function populateFilterDropdowns() {}
+        function resetFilters() {}
         function downloadAsPDF() {
-            const element = document.getElementById('sheetPrintArea');
-            const opt = {
-                margin:       [0.3, 0.3, 0.3, 0.3],
-                filename:     `Carton_Sheet_Report_${new Date().toISOString().slice(0,10)}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-            };
-
-            html2pdf().set(opt).from(element).save();
-        }
-
-        // LIGHTBOX MODAL
-        function openImgModal(src) {
-            document.getElementById('modalImg').src = src;
-            document.getElementById('imgModal').classList.remove('hidden');
-        }
-        function closeImgModal() {
-            document.getElementById('imgModal').classList.add('hidden');
+            html2pdf().from(document.getElementById('sheetPrintArea')).save();
         }
     </script>
 </body>
