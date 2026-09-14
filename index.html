@@ -3,141 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carton Tracker App</title>
+    <title>কার্টন ট্র্যাকিং লিস্ট</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
+            background-color: #f8f9fa;
             margin: 0;
             padding: 15px;
         }
         .container {
-            max-width: 500px;
+            max-width: 800px;
             margin: 0 auto;
             background: #fff;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        h2 { text-align: center; color: #333; }
-        label { font-weight: bold; margin-top: 10px; display: block; }
-        input, textarea, select, button {
-            width: 100%;
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input, textarea, button {
             padding: 10px;
-            margin-top: 5px;
-            border-radius: 5px;
             border: 1px solid #ccc;
-            box-sizing: border-box;
+            border-radius: 5px;
+            font-size: 14px;
         }
+        input[type="text"] { flex: 1; min-width: 150px; }
+        textarea { flex: 2; min-width: 200px; height: 38px; resize: none; }
+        input[type="file"] { flex: 1; min-width: 180px; }
         button {
-            background-color: #007bff;
+            background-color: #28a745;
             color: white;
             font-weight: bold;
             border: none;
-            margin-top: 15px;
             cursor: pointer;
+            padding: 10px 20px;
         }
-        button:hover { background-color: #0056b3; }
-        .carton-card {
-            background: #eef2f5;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 5px solid #007bff;
+        button:hover { background-color: #218838; }
+
+        /* টেবিল স্টাইল */
+        .table-responsive {
+            overflow-x: auto;
         }
-        .carton-card img {
+        table {
             width: 100%;
-            max-height: 200px;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .product-img {
+            width: 70px;
+            height: 70px;
             object-fit: cover;
             border-radius: 5px;
-            margin-top: 8px;
+            border: 1px solid #ddd;
         }
+        .no-img { color: #888; font-style: italic; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>📦 কার্টন ট্র্যাকার</h2>
-    
-    <form id="cartonForm">
-        <label>কার্টন নম্বর / নাম:</label>
-        <input type="text" id="cartonNo" placeholder="যেমন: Carton-01" required>
+    <h2>📦 কার্টন এন্ট্রি ও ট্র্যাকিং সিস্টেম</h2>
 
-        <label>প্রোডাক্টের বিবরণ (কী কী আছে):</label>
-        <textarea id="productDetails" rows="3" placeholder="যেমন: 10 Shirts, 5 Pants" required></textarea>
-
-        <label>স্টোর রুমের নাম / নম্বর:</label>
-        <input type="text" id="storeRoom" placeholder="যেমন: Store Room B" required>
-
-        <label>কার্টনের ছবি (অপশনাল):</label>
+    <!-- ডেটা এন্ট্রি ফর্ম -->
+    <form id="cartonForm" class="form-group">
+        <input type="text" id="cartonNo" placeholder="কার্টন নম্বর (যেমন: C-101)" required>
+        <textarea id="productDetails" placeholder="প্রোডাক্ট ডিটেইলস (কী কী আছে)" required></textarea>
         <input type="file" id="cartonImg" accept="image/*">
-
-        <button type="submit">কার্টন সেভ করুন</button>
+        <button type="submit">যোগ করুন</button>
     </form>
 
-    <hr style="margin-top: 25px;">
-    <h3>পাঠানো কার্টনের তালিকা</h3>
-    <div id="cartonList"></div>
+    <!-- ট্র্যাকিং টেবিল -->
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%;">সিরিয়াল</th>
+                    <th style="width: 20%;">কার্টন নম্বর</th>
+                    <th style="width: 45%;">প্রোডাক্ট ডিটেইলস</th>
+                    <th style="width: 25%;">ছবি</th>
+                </tr>
+            </thead>
+            <tbody id="cartonTableBody">
+                <!-- ডায়নামিকভাবে নতুন সারি যুক্ত হবে -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
     const form = document.getElementById('cartonForm');
-    const cartonList = document.getElementById('cartonList');
+    const tableBody = document.getElementById('cartonTableBody');
 
-    let savedCartons = JSON.parse(localStorage.getItem('cartons')) || [];
+    // লোকাল স্টোরেজ থেকে সেভ হওয়া ডেটা পড়া
+    let cartons = JSON.parse(localStorage.getItem('cartonRecords')) || [];
 
-    function renderCartons() {
-        cartonList.innerHTML = '';
-        savedCartons.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'carton-card';
-            card.innerHTML = `
-                <h4>📦 ${item.cartonNo}</h4>
-                <p><strong>প্রোডাক্ট:</strong> ${item.productDetails}</p>
-                <p><strong>গন্তব্য:</strong> ${item.storeRoom}</p>
-                <p><small>তারিখ: ${item.date}</small></p>
-                ${item.image ? `<img src="${item.image}">` : ''}
+    // টেবিলে ডেটা দেখানোর ফাংশন
+    function renderTable() {
+        tableBody.innerHTML = '';
+        cartons.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${index + 1}</strong></td>
+                <td>${item.cartonNo}</td>
+                <td style="text-align: left;">${item.productDetails}</td>
+                <td>
+                    ${item.image ? `<img src="${item.image}" class="product-img" alt="Carton Image">` : '<span class="no-img">ছবি নেই</span>'}
+                </td>
             `;
-            cartonList.prepend(card);
+            tableBody.appendChild(row);
         });
     }
 
+    // নতুন কার্টন জমা দেওয়া
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const cartonNo = document.getElementById('cartonNo').value;
         const productDetails = document.getElementById('productDetails').value;
-        const storeRoom = document.getElementById('storeRoom').value;
         const imgInput = document.getElementById('cartonImg');
 
-        let imageData = "";
-
-        const saveData = (img) => {
-            const newCarton = {
-                cartonNo,
-                productDetails,
-                storeRoom,
-                image: img,
-                date: new Date().toLocaleString('bn-BD')
+        const saveRecord = (imgBase64) => {
+            const newEntry = {
+                cartonNo: cartonNo,
+                productDetails: productDetails,
+                image: imgBase64
             };
-            savedCartons.push(newCarton);
-            localStorage.setItem('cartons', JSON.stringify(savedCartons));
-            renderCartons();
+            cartons.push(newEntry);
+                localStorage.setItem('cartonRecords', JSON.stringify(cartons));
+            renderTable();
             form.reset();
         };
 
         if (imgInput.files && imgInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                saveData(e.target.result);
+                saveRecord(e.target.result);
             };
             reader.readAsDataURL(imgInput.files[0]);
         } else {
-            saveData("");
+            saveRecord("");
         }
     });
 
-    renderCartons();
+    // পেজ লোড হলে টেবিল রেন্ডার হবে
+    renderTable();
 </script>
 
 </body>
