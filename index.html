@@ -1,230 +1,95 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>কার্টন ট্র্যাকিং অ্যাপ</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 15px;
-        }
-        .container {
-            max-width: 950px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        h2 { text-align: center; color: #333; margin-bottom: 20px; }
-        
-        /* ফর্ম লেআউট */
-        .form-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: #eef2f5;
-            padding: 15px;
-            border-radius: 6px;
-        }
-        input, textarea, button {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        .input-name { flex: 1; min-width: 140px; }
-        .input-carton { flex: 1; min-width: 140px; }
-        textarea { flex: 2; min-width: 220px; height: 38px; resize: none; }
-        input[type="file"] { flex: 1; min-width: 180px; }
-        button {
-            background-color: #28a745;
-            color: white;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            padding: 10px 20px;
-        }
-        button:hover { background-color: #218838; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix Digital Rain</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        /* টেবিল লেআউট */
-        .table-responsive { overflow-x: auto; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            border: 1px solid #dee2e6;
-            padding: 10px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        
-        .product-img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .product-img:hover { opacity: 0.8; }
-        .no-img { color: #888; font-style: italic; font-size: 12px; }
+    body {
+      background-color: #000;
+      overflow: hidden;
+    }
 
-        /* ছবি বড় করে দেখার পপ-আপ (Modal) */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            max-width: 80%;
-            max-height: 80%;
-            border-radius: 8px;
-        }
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 35px;
-            color: white;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
+    canvas {
+      display: block;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>📦 কার্টন এন্ট্রি ও ট্র্যাকিং সিস্টেম</h2>
+  <canvas id="matrix"></canvas>
 
-    <!-- এন্ট্রি ফর্ম -->
-    <form id="cartonForm" class="form-group">
-        <input type="text" id="personName" class="input-name" placeholder="আপনার নাম" required>
-        <input type="text" id="cartonNo" class="input-carton" placeholder="কার্টন নম্বর (যেমন: C-101)" required>
-        <textarea id="productDetails" placeholder="প্রোডাক্ট ডিটেইলস (কী কী আছে)" required></textarea>
-        <input type="file" id="cartonImg" accept="image/*">
-        <button type="submit">যোগ করুন</button>
-    </form>
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
 
-    <!-- ট্র্যাকিং টেবিল -->
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 5%;">সিরিয়াল</th>
-                    <th style="width: 15%;">তৈরি করেছে</th>
-                    <th style="width: 15%;">কার্টন নম্বর</th>
-                    <th style="width: 35%;">প্রোডাক্ট ডিটেইলস</th>
-                    <th style="width: 15%;">তারিখ ও সময়</th>
-                    <th style="width: 15%;">ছবি</th>
-                </tr>
-            </thead>
-            <tbody id="cartonTableBody">
-                <!-- ডায়নামিকভাবে রো যুক্ত হবে -->
-            </tbody>
-        </table>
-    </div>
-</div>
+    // Make canvas full screen
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
 
-<!-- ইমেজ পপ-আপ কন্টেইনার -->
-<div id="imgModal" class="modal">
-    <span class="close-btn" onclick="closeModal()">&times;</span>
-    <img class="modal-content" id="modalImg">
-</div>
+    // Characters: Katakana, English, and Numbers
+    const characters = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const fontSize = 16;
+    let columns = Math.floor(canvas.width / fontSize);
 
-<script>
-    const form = document.getElementById('cartonForm');
-    const tableBody = document.getElementById('cartonTableBody');
-
-    // লোকাল স্টোরেজ থেকে ডেটা লোড
-    let cartons = JSON.parse(localStorage.getItem('cartonRecords')) || [];
-
-    // টেবিলে ডেটা দেখানোর ফাংশন
-    function renderTable() {
-        tableBody.innerHTML = '';
-        cartons.forEach((item, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><strong>${index + 1}</strong></td>
-                <td>${item.personName}</td>
-                <td>${item.cartonNo}</td>
-                <td style="text-align: left;">${item.productDetails}</td>
-                <td style="font-size: 13px;">${item.dateTime}</td>
-                <td>
-                    ${item.image ? `<img src="${item.image}" class="product-img" onclick="openModal('${item.image}')" alt="Carton Image">` : '<span class="no-img">ছবি নেই</span>'}
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
+    // Track the Y position of each drop
+    const drops = [];
+    for (let i = 0; i < columns; i++) {
+      drops[i] = Math.floor(Math.random() * -100); // Random offset for smooth entry
     }
 
-    // নতুন এন্ট্রি সেভ করার ইভেন্ট
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
+    // Drawing the animation
+    function draw() {
+      // Black background with slight opacity to create fading trail effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        const personName = document.getElementById('personName').value;
-        const cartonNo = document.getElementById('cartonNo').value;
-        const productDetails = document.getElementById('productDetails').value;
-        const imgInput = document.getElementById('cartonImg');
+      ctx.fillStyle = '#0F0'; // Matrix Green
+      ctx.font = `${fontSize}px monospace`;
 
-        // আজকের তারিখ ও সময়
-        const now = new Date();
-        const dateTime = now.toLocaleDateString('bn-BD') + ' - ' + now.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+      for (let i = 0; i < drops.length; i++) {
+        // Pick a random character
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
 
-        const saveRecord = (imgBase64) => {
-            const newEntry = {
-                personName: personName,
-                cartonNo: cartonNo,
-                productDetails: productDetails,
-                dateTime: dateTime,
-                image: imgBase64
-            };
-            cartons.unshift(newEntry); // নতুন এন্ট্রি উপরে থাকবে
-            localStorage.setItem('cartonRecords', JSON.stringify(cartons));
-            renderTable();
-            form.reset();
-        };
+        ctx.fillText(text, x, y);
 
-        if (imgInput.files && imgInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                saveRecord(e.target.result);
-            };
-            reader.readAsDataURL(imgInput.files[0]);
-        } else {
-            saveRecord("");
+        // Reset drop to top after passing screen height
+        if (y > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
         }
+
+        drops[i]++;
+      }
+    }
+
+    // Run animation at ~30 FPS
+    setInterval(draw, 33);
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      const newColumns = Math.floor(canvas.width / fontSize);
+      
+      if (newColumns > drops.length) {
+        for (let i = drops.length; i < newColumns; i++) {
+          drops[i] = Math.floor(Math.random() * -100);
+        }
+      } else {
+        drops.length = newColumns;
+      }
     });
-
-    // ছবি দেখার পপ-আপ ফাংশন
-    function openModal(imgSrc) {
-        document.getElementById('modalImg').src = imgSrc;
-        document.getElementById('imgModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('imgModal').style.display = 'none';
-    }
-
-    // পেজ লোড হলে টেবিল দেখাবে
-    renderTable();
-</script>
-
+  </script>
 </body>
 </html>
